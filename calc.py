@@ -39,18 +39,18 @@ def make_calculator():
     lexer = lex.lex()
 
     # Parsing rules
-    # Precedence for MORADD, MORSUB, MORMUL, MORDIV seem to change nothing
     precedence = (
-        ('right', 'MORADD', 'MORSUB'),
-        ('right', 'MORMUL', 'MORDIV'),
         ('left', '+', '-'),
+        ('right', 'MORADD', 'MORSUB'),
         ('left', '*', '/'),
+        ('right', 'MORMUL', 'MORDIV'),
         ('right', 'UMINUS'),
     )
 
     def p_statement_expr(p):
         'statement : expression'
         p[0] = p[1]
+        print('Calculation complete')
 
     def p_expression_binop(p):
         '''expression : expression '+' expression
@@ -75,7 +75,7 @@ def make_calculator():
     # Ex.: Previous result was 9. When executing '*2+2' the result should be 20,
     # but since the binop is performed first, it returns 36
     def p_expression_more(p):
-        '''statement : '+' expression %prec MORADD
+        '''expression : '+' expression %prec MORADD
                       | '-' expression %prec MORSUB
                       | '*' expression %prec MORMUL
                       | '/' expression %prec MORDIV '''
@@ -97,11 +97,12 @@ def make_calculator():
     def p_expression_uminus(p):
         "expression : '(' '-' expression ')' %prec UMINUS"
         p[0] = -p[3]
-        #print('Doing the thing')
+        print('Doing the thing')
         
     def p_expression_group(p):
         "expression : '(' expression ')'"
         p[0] = p[2]
+        print('Parentheses!')
 
     def p_expression_number(p):
         "expression : NUMBER"
