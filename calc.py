@@ -39,7 +39,7 @@ def make_calculator():
     lexer = lex.lex()
 
     # Parsing rules
-
+    # Precedence for MORADD, MORSUB, MORMUL, MORDIV seem to change nothing
     precedence = (
         ('left', 'MORADD', 'MORSUB'),
         ('left', 'MORMUL', 'MORDIV'),
@@ -70,6 +70,8 @@ def make_calculator():
             p[0] = p[1] / p[3]
             print('Division ', p[0])
 
+    # Executed after binop, so results can often be wrong when continuing
+    # calculations on a previous result and an expression starts with '*' or '/'
     def p_expression_more(p):
         '''statement : '+' expression %prec MORADD
                       | '-' expression %prec MORSUB
@@ -88,8 +90,7 @@ def make_calculator():
             p[0] = r / p[2]
             print('Division2 ', p[0])    
 
-    # Reduce/Reduce conflict with above '-' statement, but seems to work when testing??
-    #Spoiler: there are bugs after all
+    # Reduce/Reduce conflict with above '-' statement
     def p_expression_uminus(p):
         "expression : '-' expression %prec UMINUS"
         p[0] = -p[2]
