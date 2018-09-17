@@ -41,8 +41,8 @@ def make_calculator():
     # Parsing rules
     # Precedence for MORADD, MORSUB, MORMUL, MORDIV seem to change nothing
     precedence = (
-        ('left', 'MORADD', 'MORSUB'),
-        ('left', 'MORMUL', 'MORDIV'),
+        ('right', 'MORADD', 'MORSUB'),
+        ('right', 'MORMUL', 'MORDIV'),
         ('left', '+', '-'),
         ('left', '*', '/'),
         ('right', 'UMINUS'),
@@ -72,6 +72,8 @@ def make_calculator():
 
     # Executed after binop, so results can often be wrong when continuing
     # calculations on a previous result and an expression starts with '*' or '/'
+    # Ex.: Previous result was 9. When executing '*2+2' the result should be 20,
+    # but since the binop is performed first, it returns 36
     def p_expression_more(p):
         '''statement : '+' expression %prec MORADD
                       | '-' expression %prec MORSUB
@@ -91,10 +93,11 @@ def make_calculator():
             print('Division2 ', p[0])    
 
     # Reduce/Reduce conflict with above '-' statement
+    # Solved Reduce/Reduce conflict by requiring parentheses
     def p_expression_uminus(p):
-        "expression : '-' expression %prec UMINUS"
-        p[0] = -p[2]
-        print('Doing the thing')
+        "expression : '(' '-' expression ')' %prec UMINUS"
+        p[0] = -p[3]
+        #print('Doing the thing')
         
     def p_expression_group(p):
         "expression : '(' expression ')'"
