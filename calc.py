@@ -1,7 +1,6 @@
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 import sys
-sys.path.insert(0, "../..")
 
 if sys.version_info[0] >= 3:
     raw_input = input
@@ -42,6 +41,7 @@ def make_calculator():
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
+        ('right', 'UMINUS'),
     )
 
     def p_statement_expr(p):
@@ -50,27 +50,43 @@ def make_calculator():
            expr_cont  : atom'''
         p[0] = p[1]
 
-    def p_expression_binop(p):
+    def p_expression_add(p):
         '''expression : expression '+' expression
-                      | expression '-' expression
-                      | expression '*' expression
-                      | expression '/' expression
-           expr_cont  : expr_cont  '+' expression
-                      | expr_cont  '-' expression
-                      | expr_cont  '*' expression
-                      | expr_cont  '/' expression'''
-        if p[2] == '+':
+           expr_cont  : expr_cont  '+' expression'''
+        try:
             p[0] = p[1] + p[3]
-        elif p[2] == '-':
+        except TypeError:
+            print('Error. Previous result not found.')
+            
+    def p_expression_sub(p):
+        '''expression : expression '-' expression
+           expr_cont  :  expr_cont '-' expression'''
+        try:
             p[0] = p[1] - p[3]
-        elif p[2] == '*':
+        except TypeError:
+            print('Error. Previous result not found.')
+                  
+    def p_expression_mul(p):
+        '''expression : expression '*' expression
+           expr_cont  :  expr_cont '*' expression'''
+        try:
             p[0] = p[1] * p[3]
-        elif p[2] == '/':
+        except TypeError:
+            print('Error. Previous result not found.')
+                  
+    def p_expression_div(p):
+        '''expression : expression '/' expression
+           expr_cont  :  expr_cont '/' expression'''
+        try:
             p[0] = p[1] / p[3]
+        except ZeroDivisionError:
+            print('Cannot divide by zero')
+        except TypeError:
+            print('Error. Previous result not found.')
         
     def p_atom_uminus(p):
-        "atom : '(' '-' expression ')'"
-        p[0] = -p[3]
+        "atom : '-' atom %prec UMINUS"
+        p[0] = -p[2]
         
     def p_atom_group(p):
         "atom : '(' expression ')'"
@@ -123,7 +139,7 @@ while True:
         for line in file:
             line.rstrip('\n')
             r = calc(line)
-            print(line, "=", r)
+            print("{0} = {1}".format(line, r))
     else:
         r = calc(s)
         print(r)
