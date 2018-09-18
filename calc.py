@@ -41,78 +41,48 @@ def make_calculator():
     # Parsing rules
     precedence = (
         ('left', '+', '-'),
-        ('right', 'MORADD', 'MORSUB'),
         ('left', '*', '/'),
-        ('right', 'MORMUL', 'MORDIV'),
-        ('right', 'UMINUS'),
     )
 
     def p_statement_expr(p):
-        'statement : expression'
+        '''statement  : expr_cont
+           expression : atom
+           expr_cont  : atom'''
         p[0] = p[1]
-        print('Calculation complete')
 
     def p_expression_binop(p):
         '''expression : expression '+' expression
                       | expression '-' expression
                       | expression '*' expression
-                      | expression '/' expression'''
-        
+                      | expression '/' expression
+           expr_cont  : expr_cont  '+' expression
+                      | expr_cont  '-' expression
+                      | expr_cont  '*' expression
+                      | expr_cont  '/' expression'''
         if p[2] == '+':
             p[0] = p[1] + p[3]
-            print('Addition ', p[0])
         elif p[2] == '-':
             p[0] = p[1] - p[3]
-            print('Subtraction ', p[0])
         elif p[2] == '*':
             p[0] = p[1] * p[3]
-            print('Multiplication ', p[0])
         elif p[2] == '/':
             p[0] = p[1] / p[3]
-            print('Division ', p[0])
         
-
-    # Executed after binop, so results can often be wrong when continuing
-    # calculations on a previous result and an expression starts with '*' or '/'
-    # Ex.: Previous result was 9. When executing '*2+2' the result should be 20,
-    # but since the binop is performed first, it returns 36
-    def p_expression_more(p):
-        '''expression : '+' expression %prec MORADD
-                      | '-' expression %prec MORSUB
-                      | '*' expression %prec MORMUL
-                      | '/' expression %prec MORDIV '''
-        try:
-            if p[1] == '+':
-                p[0] = r + p[2]
-                print('Addition2 ', p[0])
-            elif p[1] == '-':
-                p[0] = r - p[2]
-                print('Subtraction2 ', p[0])
-            elif p[1] == '*':
-                p[0] = r * p[2]
-                print('Multiplication2 ', p[0])
-            elif p[1] == '/':
-                p[0] = r / p[2]
-                print('Division2 ', p[0])
-        except TypeError:
-            print('Could not parse')
-
-    # Reduce/Reduce conflict with above '-' statement
-    # Solved Reduce/Reduce conflict by requiring parentheses
-    def p_expression_uminus(p):
-        "expression : '(' '-' expression ')' %prec UMINUS"
+    def p_atom_uminus(p):
+        "atom : '(' '-' expression ')'"
         p[0] = -p[3]
-        print('Doing the thing')
         
-    def p_expression_group(p):
-        "expression : '(' expression ')'"
+    def p_atom_group(p):
+        "atom : '(' expression ')'"
         p[0] = p[2]
-        print('Parentheses!')
 
+    def p_expr_previous(p):
+        "expr_cont : "
+        p[0] = r
+    
     def p_expression_number(p):
-        "expression : NUMBER"
+        "atom : NUMBER"
         p[0] = p[1]
-        print('Found a number')
 
     def p_error(p):
         if p:
@@ -151,8 +121,9 @@ while True:
         with open(filename) as f:
             file = f.readlines()
         for line in file:
+            line.rstrip('\n')
             r = calc(line)
-            print(r)
+            print(line, "=", r)
     else:
         r = calc(s)
         print(r)
