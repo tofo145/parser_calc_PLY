@@ -57,6 +57,7 @@ def make_calculator():
                       | expression '-' expression
                       | expression '*' expression
                       | expression '/' expression'''
+        
         if p[2] == '+':
             p[0] = p[1] + p[3]
             print('Addition ', p[0])
@@ -69,6 +70,7 @@ def make_calculator():
         elif p[2] == '/':
             p[0] = p[1] / p[3]
             print('Division ', p[0])
+        
 
     # Executed after binop, so results can often be wrong when continuing
     # calculations on a previous result and an expression starts with '*' or '/'
@@ -79,18 +81,21 @@ def make_calculator():
                       | '-' expression %prec MORSUB
                       | '*' expression %prec MORMUL
                       | '/' expression %prec MORDIV '''
-        if p[1] == '+':
-            p[0] = r + p[2]
-            print('Addition2 ', p[0])
-        elif p[1] == '-':
-            p[0] = r - p[2]
-            print('Subtraction2 ', p[0])
-        elif p[1] == '*':
-            p[0] = r * p[2]
-            print('Multiplication2 ', p[0])
-        elif p[1] == '/':
-            p[0] = r / p[2]
-            print('Division2 ', p[0])    
+        try:
+            if p[1] == '+':
+                p[0] = r + p[2]
+                print('Addition2 ', p[0])
+            elif p[1] == '-':
+                p[0] = r - p[2]
+                print('Subtraction2 ', p[0])
+            elif p[1] == '*':
+                p[0] = r * p[2]
+                print('Multiplication2 ', p[0])
+            elif p[1] == '/':
+                p[0] = r / p[2]
+                print('Division2 ', p[0])
+        except TypeError:
+            print('Could not parse')
 
     # Reduce/Reduce conflict with above '-' statement
     # Solved Reduce/Reduce conflict by requiring parentheses
@@ -107,6 +112,7 @@ def make_calculator():
     def p_expression_number(p):
         "expression : NUMBER"
         p[0] = p[1]
+        print('Found a number')
 
     def p_error(p):
         if p:
