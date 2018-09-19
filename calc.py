@@ -41,7 +41,6 @@ def make_calculator():
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
-        ('right', 'UMINUS'),
     )
 
     def p_statement_expr(p):
@@ -85,7 +84,7 @@ def make_calculator():
             print('Error. Previous result not found.')
         
     def p_atom_uminus(p):
-        "atom : '-' atom %prec UMINUS"
+        "expression : '-' atom"
         p[0] = -p[2]
         
     def p_atom_group(p):
