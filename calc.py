@@ -17,7 +17,7 @@ def make_calculator():
         'NUMBER',
     )
 
-    literals = ['=', '+', '-', '*', '/', '(', ')']
+    literals = ['=', '+', '-', '*', '/', '(', ')', '^']
 
     t_ignore = " \t"
 
@@ -41,6 +41,7 @@ def make_calculator():
     precedence = (
         ('left', '+', '-'),
         ('left', '*', '/'),
+        ('right', '^'),
     )
 
     def p_statement_expr(p):
@@ -82,7 +83,24 @@ def make_calculator():
             print('Cannot divide by zero')
         except TypeError:
             print('Error. Previous result not found.')
-        
+
+    def p_expression_exp(p):
+        ''' expression : expression '^' expression
+            expr_cont  :  expr_cont '^' expression'''
+        result = 1
+        exp = p[3]
+        try:
+            if exp >= 0:
+                for i in range(exp):
+                    result *= p[1]
+            else:
+                exp *= -1
+                for i in range(exp):
+                    result /= p[1]
+            p[0] = result
+        except TypeError:
+            print('Error. Previous result not found.')
+            
     def p_atom_uminus(p):
         "expression : '-' atom"
         p[0] = -p[2]
