@@ -80,10 +80,11 @@ def make_calculator():
         try:
             p[0] = p[1] / p[3]
         except ZeroDivisionError:
-            print('Cannot divide by zero')
+            print('Cannot divide by zero.')
         except TypeError:
             print('Error. Previous result not found.')
 
+    # Exponentiation
     def p_expression_exp(p):
         ''' expression : expression '^' expression
             expr_cont  :  expr_cont '^' expression'''
@@ -100,15 +101,19 @@ def make_calculator():
             p[0] = result
         except TypeError:
             print('Error. Previous result not found.')
-            
+
+    # Unary minus
     def p_atom_uminus(p):
         "expression : '-' atom"
         p[0] = -p[2]
-        
+
+    # Parentheses
     def p_atom_group(p):
         "atom : '(' expression ')'"
         p[0] = p[2]
 
+    # Because of the structure of the grammar we need expr_cont to be parseable as empty
+    # This way, calculations on the previous result can easily be carried out
     def p_expr_previous(p):
         "expr_cont : "
         p[0] = r
