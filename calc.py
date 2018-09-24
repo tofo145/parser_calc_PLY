@@ -50,6 +50,7 @@ def make_calculator():
            expr_cont  : atom'''
         p[0] = p[1]
 
+    # Addition
     def p_expression_add(p):
         '''expression : expression '+' expression
            expr_cont  : expr_cont  '+' expression'''
@@ -57,7 +58,8 @@ def make_calculator():
             p[0] = p[1] + p[3]
         except TypeError:
             print('Error. Previous result not found.')
-            
+
+    # Subtraction        
     def p_expression_sub(p):
         '''expression : expression '-' expression
            expr_cont  :  expr_cont '-' expression'''
@@ -65,7 +67,8 @@ def make_calculator():
             p[0] = p[1] - p[3]
         except TypeError:
             print('Error. Previous result not found.')
-                  
+
+    # Multiplication              
     def p_expression_mul(p):
         '''expression : expression '*' expression
            expr_cont  :  expr_cont '*' expression'''
@@ -73,7 +76,8 @@ def make_calculator():
             p[0] = p[1] * p[3]
         except TypeError:
             print('Error. Previous result not found.')
-                  
+
+    # Division              
     def p_expression_div(p):
         '''expression : expression '/' expression
            expr_cont  :  expr_cont '/' expression'''
@@ -130,7 +134,7 @@ def make_calculator():
         decimal = p[3]
         for i in range(nod):
             decimal /= 10
-        p[0] = p[1] + decimal
+        p[0] = p[1] + round(decimal, 2)
 
     def p_error(p):
         if p:
@@ -163,15 +167,20 @@ while True:
     # Open a file and calculate each line
     if s == 'open':
         print('Choose file')
-        Tk().withdraw()
-        filename = askopenfilename()
-        print(filename)
-        with open(filename) as f:
-            file = f.readlines()
-        for line in file:
-            line.rstrip('\n')
-            r = calc(line)
-            print("{0} = {1}".format(line, r))
+        root = Tk()
+        root.attributes('-topmost', 1)
+        root.withdraw()
+        try:
+            filename = askopenfilename()
+            print(filename)
+            with open(filename) as f:
+                file = f.readlines()
+            for line in file:
+                line.rstrip('\n')
+                r = calc(line)
+                print("{0} = {1}".format(line, r))
+        except FileNotFoundError:
+            print('File not found or no file selected')
     else:
         r = calc(s)
         print(r)
