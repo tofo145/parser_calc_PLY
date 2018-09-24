@@ -17,7 +17,7 @@ def make_calculator():
         'NUMBER',
     )
 
-    literals = ['=', '+', '-', '*', '/', '(', ')', '^']
+    literals = ['=', '+', '-', '*', '/', '(', ')', '^', '.']
 
     t_ignore = " \t"
 
@@ -121,6 +121,16 @@ def make_calculator():
     def p_expression_number(p):
         "atom : NUMBER"
         p[0] = p[1]
+
+    def p_expresson_decimal(p):
+        "atom : NUMBER '.' NUMBER "
+        # Find number of decimal digits
+        nod = len(str(abs(p[3])))
+
+        decimal = p[3]
+        for i in range(nod):
+            decimal /= 10
+        p[0] = p[1] + decimal
 
     def p_error(p):
         if p:
