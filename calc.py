@@ -17,7 +17,7 @@ def make_calculator():
         'NUMBER',
     )
 
-    literals = ['=', '+', '-', '*', '/', '(', ')', '^', '.']
+    literals = ['=', '+', '-', '*', '/', '(', ')', '^', '.', '!']
 
     t_ignore = " \t"
 
@@ -122,11 +122,11 @@ def make_calculator():
         "expr_cont : "
         p[0] = r
     
-    def p_expression_number(p):
+    def p_atom_number(p):
         "atom : NUMBER"
         p[0] = p[1]
 
-    def p_expresson_decimal(p):
+    def p_atom_decimal(p):
         "atom : NUMBER '.' NUMBER "
         # Find number of decimal digits
         nod = len(str(abs(p[3])))
@@ -136,6 +136,21 @@ def make_calculator():
             decimal /= 10
         p[0] = p[1] + round(decimal, 2)
 
+    def factorial(n):
+        if n == 0:
+            return 1
+        else:
+            try:
+                return n * factorial(n-1)
+            except RecursionError:
+                print("Error. Maximum recursion depth reached. Choose a number <1000")
+                return 1
+
+    # Factorial
+    def p_atom_fac(p):
+        "atom : NUMBER '!' "
+        p[0] = factorial(p[1])
+        
     def p_error(p):
         if p:
             print("Syntax error at '%s'" % p.value)
@@ -153,6 +168,8 @@ def make_calculator():
 
     return input
 
+    
+        
 # Make a calculator object and use it
 calc = make_calculator()
 print('Type a calculation and execute with ENTER. Type \'open\' to choose a file to do calculations from.')
